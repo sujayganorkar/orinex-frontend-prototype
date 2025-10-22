@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Layout from '@/components/Layout';
+import Link from 'next/link';
 
 const Orders: React.FC = () => {
   const [activeTab, setActiveTab] = useState('Unread');
@@ -8,6 +9,7 @@ const Orders: React.FC = () => {
 
   const orders = [
     { 
+      id: 'ORD-2024-001',
       client: 'Sharma Metal Works', 
       summary: 'New order inquiry', 
       time: '10 min ago',
@@ -15,6 +17,7 @@ const Orders: React.FC = () => {
       badge: 3
     },
     { 
+      id: 'ORD-2024-002',
       client: 'Sai Engineering', 
       summary: 'Quotation ready for review', 
       time: '45 min ago',
@@ -22,6 +25,7 @@ const Orders: React.FC = () => {
       badge: 5
     },
     { 
+      id: 'ORD-2024-003',
       client: 'Patel Fabricators', 
       summary: 'Invoice ready for approval', 
       time: '1 hour ago',
@@ -29,6 +33,13 @@ const Orders: React.FC = () => {
       badge: 0
     }
   ];
+
+  const filteredOrders = orders.filter(order => {
+    if (activeTab === 'Unread') return order.status === 'unread';
+    if (activeTab === 'Pending') return order.status === 'pending';
+    if (activeTab === 'Completed') return order.status === 'completed';
+    return true;
+  });
 
   return (
     <Layout>
@@ -64,18 +75,55 @@ const Orders: React.FC = () => {
         </div>
 
         <div className="space-y-4">
-          {orders.map((order, index) => (
+          {filteredOrders.map((order, index) => (
             <div 
               key={index} 
-              className="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center"
+              className="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center hover:shadow-md transition-shadow"
             >
               <div>
                 <div className="font-bold">{order.client}</div>
                 <div className="text-sm text-gray-500">{order.summary} - {order.time}</div>
+                <div className="text-xs text-gray-400 mt-1">Order ID: {order.id}</div>
               </div>
-              <button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition">Process Now</button>
+              <div className="flex gap-2">
+                <Link href="/order-detail">
+                  <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
+                    View Details
+                  </button>
+                </Link>
+                <button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition">
+                  Process Now
+                </button>
+              </div>
             </div>
           ))}
+        </div>
+
+        {filteredOrders.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-lg mb-2">No orders in {activeTab.toLowerCase()}</div>
+            <div className="text-gray-500 text-sm">
+              {activeTab === 'Unread' && 'New orders will appear here when they arrive'}
+              {activeTab === 'Pending' && 'Orders waiting for action will be shown here'}
+              {activeTab === 'Completed' && 'Completed orders will be listed here'}
+            </div>
+          </div>
+        )}
+
+        {/* Quick Stats */}
+        <div className="mt-8 grid grid-cols-3 gap-4">
+          <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+            <div className="text-2xl font-bold text-primary">8</div>
+            <div className="text-sm text-gray-600">Total Today</div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+            <div className="text-2xl font-bold text-green-600">5</div>
+            <div className="text-sm text-gray-600">Processed</div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+            <div className="text-2xl font-bold text-orange-600">3</div>
+            <div className="text-sm text-gray-600">Pending Action</div>
+          </div>
         </div>
       </div>
     </Layout>
