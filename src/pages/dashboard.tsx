@@ -3,7 +3,7 @@ import Layout from '@/components/Layout';
 
 const Dashboard: React.FC = () => {
   const stats = [
-    { title: 'Orders Processed Today', value: '12' },
+    { title: 'Orders Completed Today', value: '12' },
     { title: 'Pending Invoices', value: '2' },
     { title: 'Pending Quotations', value: '5' },
     { title: 'Monthly Revenue', value: '₹2.45L' }
