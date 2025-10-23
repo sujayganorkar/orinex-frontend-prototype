@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 
+// Order interface must match the one in enhanced-dashboard
 interface Order {
   id: string;
   client: string;
   summary: string;
   time: string;
   priority: 'high' | 'medium' | 'low';
-  isUrgent?: boolean;
+  isUrgent: boolean;
+  status: 'unread' | 'pending' | 'completed';
 }
 
 interface DragDropOrdersProps {
@@ -58,9 +60,18 @@ const DragDropOrders: React.FC<DragDropOrdersProps> = ({ orders, onOrdersReorder
     }
   };
 
+  const getPriorityBadgeColor = (priority: Order['priority']) => {
+    switch (priority) {
+      case 'high': return 'bg-red-100 text-red-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      case 'low': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <div className="space-y-2">
-      {orders.map((order, index) => (
+      {orders.map((order) => (
         <div
           key={order.id}
           draggable
@@ -74,34 +85,26 @@ const DragDropOrders: React.FC<DragDropOrdersProps> = ({ orders, onOrdersReorder
             ${getPriorityColor(order.priority)}
             ${draggedItem === order.id ? 'opacity-50 scale-95' : ''}
             ${dragOverItem === order.id ? 'ring-2 ring-primary ring-opacity-50' : ''}
-            ${order.isUrgent ? 'animate-pulse ring-2 ring-red-400' : ''}
+            ${order.isUrgent ? 'bg-red-50' : ''}
           `}
         >
           <div className="flex justify-between items-center">
             <div className="flex-1">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">#{index + 1}</span>
+              <div className="flex items-center gap-3">
                 <div className="font-bold">{order.client}</div>
+                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getPriorityBadgeColor(order.priority)}`}>
+                  {order.priority.toUpperCase()}
+                </span>
                 {order.isUrgent && (
-                  <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                  <span className="px-2 py-1 bg-red-500 text-white rounded-full text-xs font-semibold">
                     URGENT
                   </span>
                 )}
               </div>
               <div className="text-sm text-gray-500">{order.summary} - {order.time}</div>
             </div>
-            <div className="flex items-center space-x-2">
-              <span className={`
-                text-xs px-2 py-1 rounded-full
-                ${order.priority === 'high' ? 'bg-red-100 text-red-800' : ''}
-                ${order.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : ''}
-                ${order.priority === 'low' ? 'bg-green-100 text-green-800' : ''}
-              `}>
-                {order.priority.toUpperCase()}
-              </span>
-              <div className="text-gray-400 cursor-move">
-                ⋮⋮
-              </div>
+            <div className="text-gray-400 cursor-move text-lg">
+              ⋮⋮
             </div>
           </div>
         </div>
