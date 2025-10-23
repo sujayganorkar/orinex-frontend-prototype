@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 
-// Define a consistent Order interface
+// Define the exact Order type (must match DragDropOrders component)
 interface Order {
   id: string;
   client: string;
@@ -12,7 +12,7 @@ interface Order {
   status: 'unread' | 'pending' | 'completed';
 }
 
-const Dashboard: React.FC = () => {
+const EnhancedDashboard: React.FC = () => {
   const stats = [
     { title: 'Orders Processed Today', value: '12' },
     { title: 'Pending Invoices', value: '2' },
@@ -20,33 +20,34 @@ const Dashboard: React.FC = () => {
     { title: 'Monthly Revenue', value: '₹2.45L' }
   ];
 
+  // Initialize with consistent typing
   const [orders, setOrders] = useState<Order[]>([
     { 
       id: '1',
       client: 'Tata Precision Components', 
       summary: 'Quotation sent', 
       time: '25 min ago',
-      priority: 'high' as const,
+      priority: 'high',
       isUrgent: true,
-      status: 'pending' as const
+      status: 'pending'
     },
     { 
       id: '2',
       client: 'Mahindra Engineering', 
       summary: 'Invoice generated', 
       time: '2 hours ago',
-      priority: 'medium' as const,
+      priority: 'medium',
       isUrgent: false,
-      status: 'completed' as const
+      status: 'completed'
     },
     { 
       id: '3',
       client: 'Bharat Forge Ltd.', 
       summary: 'New order received', 
       time: '4 hours ago',
-      priority: 'high' as const,
+      priority: 'high',
       isUrgent: true,
-      status: 'unread' as const
+      status: 'unread'
     }
   ]);
 
@@ -64,8 +65,13 @@ const Dashboard: React.FC = () => {
     }
   });
 
-  // Function to handle order updates with proper typing
-  const updateOrder = (orderId: string, updates: Partial<Order>) => {
+  // Function to handle order reordering (for DragDropOrders component)
+  const handleOrdersReorder = (reorderedOrders: Order[]): void => {
+    setOrders(reorderedOrders);
+  };
+
+  // Function to handle order updates
+  const updateOrder = (orderId: string, updates: Partial<Order>): void => {
     setOrders(prevOrders => 
       prevOrders.map(order => 
         order.id === orderId ? { ...order, ...updates } : order
@@ -73,23 +79,14 @@ const Dashboard: React.FC = () => {
     );
   };
 
-  // Function to add new order
-  const addOrder = (newOrder: Omit<Order, 'id'>) => {
-    const orderWithId: Order = {
-      ...newOrder,
-      id: Date.now().toString(),
-      isUrgent: newOrder.isUrgent || false,
-      status: newOrder.status || 'unread'
-    };
-    setOrders(prevOrders => [...prevOrders, orderWithId]);
-  };
-
   // Function to remove order
-  const removeOrder = (orderId: string) => {
-    setOrders(prevOrders => prevOrders.filter(order => order.id !== orderId));
+  const removeOrder = (orderId: string): void => {
+    setOrders(prevOrders => 
+      prevOrders.filter(order => order.id !== orderId)
+    );
   };
 
-  const getPriorityColor = (priority: Order['priority']) => {
+  const getPriorityColor = (priority: Order['priority']): string => {
     switch(priority) {
       case 'high':
         return 'text-red-600 bg-red-100';
@@ -158,6 +155,8 @@ const Dashboard: React.FC = () => {
 
         {/* Recent Activity */}
         <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
+        
+        {/* Conditional rendering: Use DragDropOrders if available, otherwise fallback */}
         <div className="space-y-4">
           {filteredOrders.map((order) => (
             <div 
@@ -206,4 +205,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default EnhancedDashboard;
