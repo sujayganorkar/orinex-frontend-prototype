@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 const Sidebar: React.FC = () => {
   const router = useRouter();
-  const [activeLanguage, setActiveLanguage] = useState('EN');
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard' },
@@ -13,8 +12,6 @@ const Sidebar: React.FC = () => {
     { href: '/settings', label: 'Settings' },
     { href: '/help', label: 'Help & Support' }
   ];
-
-  const languages = ['EN', 'हि', 'मराठी'];
 
   return (
     <div className="w-64 bg-primary text-white flex flex-col p-6">
@@ -36,23 +33,6 @@ const Sidebar: React.FC = () => {
           </Link>
         ))}
       </nav>
-
-      <div className="flex justify-around mt-6">
-        {languages.map((lang) => (
-          <button 
-            key={lang}
-            onClick={() => setActiveLanguage(lang)}
-            className={`
-              px-3 py-1 rounded border border-white 
-              ${activeLanguage === lang 
-                ? 'bg-white text-primary' 
-                : 'hover:bg-primary-light'}
-            `}
-          >
-            {lang}
-          </button>
-        ))}
-      </div>
     </div>
   );
 };
