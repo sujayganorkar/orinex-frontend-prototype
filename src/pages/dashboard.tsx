@@ -5,7 +5,7 @@ const Dashboard: React.FC = () => {
   const stats = [
     { title: 'Orders Processed Today', value: '12' },
     { title: 'Pending Actions', value: '3' },
-    { title: 'Error Rate', value: '0%' }
+    { title: 'Monthly Revenue', value: '₹2.45L' }
   ];
 
   const recentActivities = [
