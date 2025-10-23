@@ -7,11 +7,11 @@ const Sidebar: React.FC = () => {
   const [activeLanguage, setActiveLanguage] = useState('EN');
 
   const navItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: '📊' },
-    { href: '/orders', label: 'Orders', icon: '📦' },
-    { href: '/templates', label: 'Templates', icon: '📄' },
-    { href: '/settings', label: 'Settings', icon: '⚙️' },
-    { href: '/help', label: 'Help & Support', icon: '❓' }
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/orders', label: 'Orders' },
+    { href: '/templates', label: 'Templates' },
+    { href: '/settings', label: 'Settings' },
+    { href: '/help', label: 'Help & Support' }
   ];
 
   const languages = ['EN', 'हि', 'मराठी'];
@@ -32,7 +32,6 @@ const Sidebar: React.FC = () => {
                 : 'hover:bg-primary-light'}
             `}
           >
-            <span className="mr-3">{item.icon}</span>
             {item.label}
           </Link>
         ))}
