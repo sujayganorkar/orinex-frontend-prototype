@@ -4,7 +4,6 @@ import Layout from '@/components/Layout';
 const Dashboard: React.FC = () => {
   const stats = [
     { title: 'Orders Processed Today', value: '12' },
-    { title: 'Time Saved This Week', value: '37.5 hours' },
     { title: 'Pending Actions', value: '3' },
     { title: 'Error Rate', value: '0%' }
   ];
@@ -41,7 +40,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-3 gap-6 mb-8">
           {stats.map((stat, index) => (
             <div 
               key={index} 
