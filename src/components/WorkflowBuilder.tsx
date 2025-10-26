@@ -19,9 +19,21 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
   const [blocks, setBlocks] = useState<WorkflowBlock[]>(initialWorkflow?.blocks || []);
   const [selectedBlock, setSelectedBlock] = useState<string | null>(null);
   const [draggedBlock, setDraggedBlock] = useState<WorkflowBlock | null>(null);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [pendingBlockId, setPendingBlockId] = useState<string | null>(null);
+
+  // Load templates from localStorage
+  const [availableTemplates, setAvailableTemplates] = useState<any[]>([]);
+  
+  React.useEffect(() => {
+    const saved = localStorage.getItem('templates');
+    if (saved) {
+      setAvailableTemplates(JSON.parse(saved));
+    }
+  }, [showTemplateModal]);
 
   const blockTypes = [
-    { type: 'template', icon: '📄', label: 'Generate Template', color: 'bg-blue-100' },
+    { type: 'template', icon: '📄', label: 'Generate Document', color: 'bg-blue-100' },
     { type: 'condition', icon: '🔀', label: 'Condition', color: 'bg-yellow-100' },
     { type: 'action', icon: '⚡', label: 'Action', color: 'bg-green-100' },
     { type: 'delay', icon: '⏱️', label: 'Delay', color: 'bg-purple-100' }
@@ -45,9 +57,53 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
       const x = e.clientX - canvas.left;
       const y = e.clientY - canvas.top;
       
-      setBlocks([...blocks, { ...draggedBlock, x, y }]);
+      const newBlock = { ...draggedBlock, x, y };
+      
+      // If it's a template block, show template selection modal
+      if (newBlock.type === 'template') {
+        setBlocks([...blocks, newBlock]);
+        setPendingBlockId(newBlock.id);
+        setShowTemplateModal(true);
+      } else {
+        setBlocks([...blocks, newBlock]);
+      }
+      
       setDraggedBlock(null);
     }
+  };
+
+  const handleTemplateSelection = (template: any) => {
+    if (pendingBlockId) {
+      setBlocks(blocks.map(block => 
+        block.id === pendingBlockId 
+          ? { ...block, config: { 
+              templateId: template.id,
+              name: template.name, 
+              format: template.type 
+            }} 
+          : block
+      ));
+      setSelectedBlock(pendingBlockId);
+    }
+    setShowTemplateModal(false);
+    setPendingBlockId(null);
+  };
+
+  const handleCreateNewDocument = () => {
+    if (pendingBlockId) {
+      setBlocks(blocks.map(block => 
+        block.id === pendingBlockId 
+          ? { ...block, config: { 
+              templateId: 'scratch',
+              name: 'New Document', 
+              format: 'docx' 
+            }} 
+          : block
+      ));
+      setSelectedBlock(pendingBlockId);
+    }
+    setShowTemplateModal(false);
+    setPendingBlockId(null);
   };
 
   const handleBlockMove = (id: string, x: number, y: number) => {
@@ -74,7 +130,7 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
       id: initialWorkflow?.id || `workflow_${Date.now()}`,
       name: workflowName,
       blocks,
-      connections: [], // Can be extended for block connections
+      connections: [],
       createdAt: initialWorkflow?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -177,7 +233,7 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
                 <div className="text-center">
                   <div className="text-4xl mb-4">🎨</div>
                   <div className="text-lg font-semibold">Drag blocks here to build your workflow</div>
-                  <div className="text-sm mt-2">Start by dragging a "Generate Template" block</div>
+                  <div className="text-sm mt-2">Start by dragging a "Generate Document" block</div>
                 </div>
               </div>
             )}
@@ -286,14 +342,19 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
                   {selectedBlockData.type === 'template' && (
                     <div className="space-y-3">
                       <div>
-                        <label className="block mb-2 text-sm font-medium">Template Name</label>
-                        <input
-                          type="text"
-                          value={selectedBlockData.config.name || ''}
-                          onChange={(e) => handleBlockConfigUpdate({ ...selectedBlockData.config, name: e.target.value })}
-                          className="w-full px-3 py-2 border rounded-md"
-                          placeholder="Select template..."
-                        />
+                        <label className="block mb-2 text-sm font-medium">Selected Template</label>
+                        <div className="p-3 bg-gray-50 rounded border">
+                          {selectedBlockData.config.name || 'No template selected'}
+                        </div>
+                        <button
+                          onClick={() => {
+                            setPendingBlockId(selectedBlock);
+                            setShowTemplateModal(true);
+                          }}
+                          className="mt-2 w-full px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+                        >
+                          Change Template
+                        </button>
                       </div>
                       <div>
                         <label className="block mb-2 text-sm font-medium">Output Format</label>
@@ -409,6 +470,77 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
           </div>
         </div>
       </div>
+
+      {/* Template Selection Modal */}
+      {showTemplateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-auto">
+            <h3 className="text-xl font-bold mb-4">Select Template or Create New</h3>
+            
+            <div className="mb-6">
+              <button
+                onClick={handleCreateNewDocument}
+                className="w-full p-4 border-2 border-dashed border-primary rounded-lg hover:bg-blue-50 transition"
+              >
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-3xl">➕</span>
+                  <div>
+                    <div className="font-semibold text-primary">Create New Document from Scratch</div>
+                    <div className="text-sm text-gray-600">Start with a blank document</div>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {availableTemplates.length > 0 && (
+              <>
+                <div className="border-t pt-4 mb-4">
+                  <h4 className="font-semibold mb-3">Or choose from existing templates:</h4>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  {availableTemplates.map((template) => (
+                    <button
+                      key={template.id}
+                      onClick={() => handleTemplateSelection(template)}
+                      className="p-4 border rounded-lg hover:border-primary hover:bg-blue-50 transition text-left"
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="text-2xl">📄</span>
+                        <div className="flex-1">
+                          <div className="font-semibold">{template.name}</div>
+                          <div className="text-sm text-gray-600">{template.description || 'No description'}</div>
+                          <div className="text-xs text-gray-400 mt-1">{template.type.toUpperCase()}</div>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {availableTemplates.length === 0 && (
+              <div className="text-center text-gray-400 py-8">
+                <div className="text-4xl mb-2">📝</div>
+                <div className="text-sm">No templates available</div>
+                <div className="text-xs mt-1">Create templates in the Templates page first</div>
+              </div>
+            )}
+
+            <div className="flex gap-2 mt-6">
+              <button
+                onClick={() => {
+                  setShowTemplateModal(false);
+                  setPendingBlockId(null);
+                }}
+                className="flex-1 px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
