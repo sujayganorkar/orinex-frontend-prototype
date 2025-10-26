@@ -27,8 +27,8 @@ const Orders: React.FC = () => {
     { 
       id: 'ORD-2024-003',
       client: 'Patel Fabricators', 
-      summary: 'Invoice ready for approval', 
-      time: '1 hour ago',
+      summary: 'Order completed and delivered', 
+      time: '1 day ago',
       status: 'completed',
       badge: 0
     }
@@ -86,7 +86,7 @@ const Orders: React.FC = () => {
                 <div className="text-xs text-gray-400 mt-1">Order ID: {order.id}</div>
               </div>
               <div className="flex gap-2">
-                <Link href="/order-detail">
+                <Link href={`/order-detail?id=${order.id}&status=${order.status}&client=${encodeURIComponent(order.client)}`}>
                   <button className={`px-4 py-2 rounded-md transition ${
                     order.status === 'completed' 
                       ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
