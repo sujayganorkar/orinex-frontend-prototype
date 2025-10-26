@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Layout from '@/components/Layout';
-import TemplateEditor from '@/components/TemplateEditor';
+import TemplateEditorModal from '@/components/TemplateEditorModal';
 
 const Templates: React.FC = () => {
   const [activeTab, setActiveTab] = useState('Templates');
@@ -14,15 +14,35 @@ const Templates: React.FC = () => {
       type: 'docx',
       description: 'Basic quotation template',
       variables: ['client_name', 'product', 'quantity', 'price'],
-      lastModified: '2024-03-10'
+      lastModified: '2024-03-10',
+      isVisual: false
     },
     {
       id: 2,
-      name: 'Invoice Template',
+      name: 'Invoice Template', 
       type: 'docx',
       description: 'GST compliant invoice',
       variables: ['client_name', 'invoice_no', 'total_amount'],
-      lastModified: '2024-03-08'
+      lastModified: '2024-03-08',
+      isVisual: false
+    },
+    {
+      id: 3,
+      name: 'Presentation Template',
+      type: 'pptx', 
+      description: 'Company presentation slides',
+      variables: ['company_name', 'project_name', 'date'],
+      lastModified: '2024-03-12',
+      isVisual: true
+    },
+    {
+      id: 4,
+      name: 'Price Comparison Sheet',
+      type: 'xlsx',
+      description: 'Product pricing spreadsheet',
+      variables: ['product_list', 'prices', 'quantities'],
+      lastModified: '2024-03-11',
+      isVisual: true
     }
   ]);
 
@@ -30,7 +50,7 @@ const Templates: React.FC = () => {
     if (selectedTemplate) {
       setTemplates(templates.map(t => t.id === template.id ? template : t));
     } else {
-      setTemplates([...templates, template]);
+      setTemplates([...templates, { ...template, id: templates.length + 1 }]);
     }
     setShowEditor(false);
     setSelectedTemplate(null);
@@ -38,6 +58,23 @@ const Templates: React.FC = () => {
 
   const handleDeleteTemplate = (id: number) => {
     setTemplates(templates.filter(t => t.id !== id));
+  };
+
+  const getTemplateIcon = (type: string, isVisual: boolean) => {
+    if (isVisual) {
+      switch(type) {
+        case 'docx': return '🎨📄';
+        case 'pptx': return '🎨📊'; 
+        case 'xlsx': return '🎨📈';
+        default: return '🎨📄';
+      }
+    }
+    switch(type) {
+      case 'docx': return '📄';
+      case 'pptx': return '📊';
+      case 'xlsx': return '📈';
+      default: return '📄';
+    }
   };
 
   return (
@@ -60,7 +97,7 @@ const Templates: React.FC = () => {
               ? 'text-primary font-bold border-b-2 border-primary' 
               : 'text-gray-600'}`}
           >
-            Templates
+            Templates ({templates.length})
           </button>
         </div>
 
@@ -69,8 +106,11 @@ const Templates: React.FC = () => {
             <div key={template.id} className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="h-40 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="text-4xl mb-2">📄</div>
-                  <div className="text-sm text-gray-600">{template.type.toUpperCase()}</div>
+                  <div className="text-4xl mb-2">{getTemplateIcon(template.type, template.isVisual)}</div>
+                  <div className="text-sm text-gray-600">
+                    {template.type.toUpperCase()} 
+                    {template.isVisual && <span className="ml-1 text-xs bg-blue-100 text-blue-800 px-1 rounded">VISUAL</span>}
+                  </div>
                 </div>
               </div>
               
@@ -81,11 +121,16 @@ const Templates: React.FC = () => {
                 <div className="mb-3">
                   <div className="text-xs font-semibold text-gray-500 mb-1">Variables:</div>
                   <div className="flex flex-wrap gap-1">
-                    {template.variables.map((v: string) => (
+                    {template.variables.slice(0, 3).map((v: string) => (
                       <span key={v} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
                         {v}
                       </span>
                     ))}
+                    {template.variables.length > 3 && (
+                      <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                        +{template.variables.length - 3} more
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -109,10 +154,25 @@ const Templates: React.FC = () => {
             </div>
           ))}
         </div>
+
+        {/* Quick Actions */}
+        <div className="mt-8 bg-blue-50 rounded-lg p-6">
+          <h3 className="font-semibold mb-3">💡 Template Tips</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+              <div className="font-medium text-blue-900">📝 Text Editor</div>
+              <div className="text-blue-700">Best for documents with lots of text content and simple formatting</div>
+            </div>
+            <div>
+              <div className="font-medium text-blue-900">🎨 Visual Designer</div>
+              <div className="text-blue-700">Perfect for presentations, flyers, and visually rich documents</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {showEditor && (
-        <TemplateEditor
+        <TemplateEditorModal
           onSave={handleSaveTemplate}
           onCancel={() => { setShowEditor(false); setSelectedTemplate(null); }}
           initialTemplate={selectedTemplate}
