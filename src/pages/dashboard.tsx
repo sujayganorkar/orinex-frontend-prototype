@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import ProgressBar from '@/components/ProgressBar';
+import Link from 'next/link';
 
 interface Order {
   id: string;
@@ -67,11 +68,18 @@ const Dashboard: React.FC = () => {
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Hello, Prakash!</h1>
-          <input 
-            type="text" 
-            placeholder="Search orders..."
-            className="w-80 px-4 py-2 rounded-full border"
-          />
+          <div className="flex items-center gap-3">
+            <input 
+              type="text" 
+              placeholder="Search orders..."
+              className="w-80 px-4 py-2 rounded-full border"
+            />
+            <Link href="/help">
+              <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
+                Help
+              </button>
+            </Link>
+          </div>
         </div>
 
         {/* Stats Grid */}
