@@ -10,8 +10,7 @@ const Sidebar: React.FC = () => {
     { href: '/orders', label: 'Orders' },
     { href: '/templates', label: 'Templates' },
     { href: '/workflows', label: 'Workflows' },
-    { href: '/settings', label: 'Settings' },
-    { href: '/help', label: 'Help & Support' }
+    { href: '/settings', label: 'Settings' }
   ];
 
   return (
