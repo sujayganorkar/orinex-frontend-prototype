@@ -119,25 +119,25 @@ const Settings: React.FC = () => {
                   ) : (
                     <label className="block font-medium">{formatFieldName(field)}</label>
                   )}
-                  {!['name', 'address', 'gstin'].includes(field) && (
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          setEditingField(field);
-                          setEditFieldName(formatFieldName(field));
-                        }}
-                        className="text-blue-500 hover:text-blue-700 text-sm"
-                      >
-                        Edit
-                      </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingField(field);
+                        setEditFieldName(formatFieldName(field));
+                      }}
+                      className="text-blue-500 hover:text-blue-700 text-sm"
+                    >
+                      Edit
+                    </button>
+                    {!['name', 'address', 'gstin'].includes(field) && (
                       <button
                         onClick={() => handleDeleteField(field)}
                         className="text-red-500 hover:text-red-700 text-sm"
                       >
                         Remove
                       </button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
                 {field === 'address' ? (
                   <textarea 
