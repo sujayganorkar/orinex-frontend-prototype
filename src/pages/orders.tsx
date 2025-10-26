@@ -87,8 +87,12 @@ const Orders: React.FC = () => {
               </div>
               <div className="flex gap-2">
                 <Link href="/order-detail">
-                  <button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition">
-                    Process Now
+                  <button className={`px-4 py-2 rounded-md transition ${
+                    order.status === 'completed' 
+                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
+                      : 'bg-primary text-white hover:bg-primary-dark'
+                  }`}>
+                    {order.status === 'completed' ? 'View Details' : 'Process Now'}
                   </button>
                 </Link>
               </div>
