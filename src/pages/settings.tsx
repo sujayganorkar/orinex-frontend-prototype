@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 
 const Settings: React.FC = () => {
-  const [companyInfo, setCompanyInfo] = useState({
+  const [companyInfo, setCompanyInfo] = useState<{[key: string]: string}>({
     name: 'Sharma Metal Works',
     address: 'Plot No. 42, MIDC Area, Nagpur, Maharashtra - 440010',
     gstin: '27ABCDE1234F1Z5'
   });
+  
+  const [showAddFieldModal, setShowAddFieldModal] = useState(false);
+  const [newFieldName, setNewFieldName] = useState('');
 
   const [automationSettings, setAutomationSettings] = useState({
     quotationGeneration: true,
@@ -36,6 +39,31 @@ const Settings: React.FC = () => {
     }
   };
 
+  const handleCompanyInfoChange = (field: string, value: string) => {
+    setCompanyInfo(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleAddField = () => {
+    if (newFieldName.trim()) {
+      const fieldKey = newFieldName.toLowerCase().replace(/\s+/g, '_');
+      setCompanyInfo(prev => ({ ...prev, [fieldKey]: '' }));
+      setNewFieldName('');
+      setShowAddFieldModal(false);
+    }
+  };
+
+  const handleDeleteField = (field: string) => {
+    const newInfo = { ...companyInfo };
+    delete newInfo[field];
+    setCompanyInfo(newInfo);
+  };
+
+  const formatFieldName = (field: string) => {
+    return field.split('_').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+
   return (
     <Layout>
       <div className="p-6">
@@ -45,35 +73,47 @@ const Settings: React.FC = () => {
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h2 className="text-xl font-semibold mb-4">Company Information</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Company Information</h2>
+            <button
+              onClick={() => setShowAddFieldModal(true)}
+              className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
+            >
+              + Add Field
+            </button>
+          </div>
+          
           <div className="space-y-4">
-            <div>
-              <label className="block mb-2">Company Name</label>
-              <input 
-                type="text" 
-                value={companyInfo.name}
-                onChange={(e) => setCompanyInfo(prev => ({...prev, name: e.target.value}))}
-                className="w-full px-3 py-2 border rounded-md"
-              />
-            </div>
-            <div>
-              <label className="block mb-2">Address</label>
-              <textarea 
-                value={companyInfo.address}
-                onChange={(e) => setCompanyInfo(prev => ({...prev, address: e.target.value}))}
-                className="w-full px-3 py-2 border rounded-md"
-                rows={3}
-              />
-            </div>
-            <div>
-              <label className="block mb-2">GSTIN</label>
-              <input 
-                type="text" 
-                value={companyInfo.gstin}
-                onChange={(e) => setCompanyInfo(prev => ({...prev, gstin: e.target.value}))}
-                className="w-full px-3 py-2 border rounded-md"
-              />
-            </div>
+            {Object.entries(companyInfo).map(([field, value]) => (
+              <div key={field}>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block font-medium">{formatFieldName(field)}</label>
+                  {!['name', 'address', 'gstin'].includes(field) && (
+                    <button
+                      onClick={() => handleDeleteField(field)}
+                      className="text-red-500 hover:text-red-700 text-sm"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                {field === 'address' ? (
+                  <textarea 
+                    value={value}
+                    onChange={(e) => handleCompanyInfoChange(field, e.target.value)}
+                    className="w-full px-3 py-2 border rounded-md"
+                    rows={3}
+                  />
+                ) : (
+                  <input 
+                    type="text" 
+                    value={value}
+                    onChange={(e) => handleCompanyInfoChange(field, e.target.value)}
+                    className="w-full px-3 py-2 border rounded-md"
+                  />
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
@@ -128,6 +168,41 @@ const Settings: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Add Field Modal */}
+      {showAddFieldModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-xl font-bold mb-4">Add Custom Field</h3>
+            
+            <div className="mb-4">
+              <label className="block mb-2">Field Name</label>
+              <input
+                type="text"
+                value={newFieldName}
+                onChange={(e) => setNewFieldName(e.target.value)}
+                className="w-full px-3 py-2 border rounded-md"
+                placeholder="e.g., Phone Number, Pan Number"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setShowAddFieldModal(false); setNewFieldName(''); }}
+                className="flex-1 px-4 py-2 bg-gray-200 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddField}
+                className="flex-1 px-4 py-2 bg-primary text-white rounded-md"
+              >
+                Add Field
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };
