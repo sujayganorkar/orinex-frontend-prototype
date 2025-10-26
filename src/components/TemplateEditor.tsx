@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface Variable {
   id: string;
@@ -26,6 +26,16 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ onSave, onCancel, initi
     type: 'text'
   });
 
+  // Load company info from localStorage
+  const [companyInfo, setCompanyInfo] = useState<{[key: string]: string}>({});
+  
+  useEffect(() => {
+    const saved = localStorage.getItem('companyInfo');
+    if (saved) {
+      setCompanyInfo(JSON.parse(saved));
+    }
+  }, []);
+
   // Formatting states
   const [fontFamily, setFontFamily] = useState('Arial');
   const [fontSize, setFontSize] = useState(12);
@@ -52,6 +62,10 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ onSave, onCancel, initi
     setContent(content + ` {{${varName}}} `);
   };
 
+  const handleInsertCompanyInfo = (field: string, value: string) => {
+    setContent(content + value);
+  };
+
   const handleDeleteVariable = (id: string) => {
     setVariables(variables.filter(v => v.id !== id));
   };
@@ -74,6 +88,12 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ onSave, onCancel, initi
       updatedAt: new Date().toISOString()
     };
     onSave(template);
+  };
+
+  const formatFieldName = (field: string) => {
+    return field.split('_').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
   };
 
   return (
@@ -194,6 +214,29 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ onSave, onCancel, initi
                 </div>
               </div>
 
+              {/* Company Info Section */}
+              <div className="pt-4 border-t">
+                <h3 className="font-semibold mb-3">Company Details</h3>
+                <p className="text-xs text-gray-500 mb-3">Click to insert into document</p>
+                <div className="space-y-2 max-h-48 overflow-auto">
+                  {Object.entries(companyInfo).map(([field, value]) => (
+                    <button
+                      key={field}
+                      onClick={() => handleInsertCompanyInfo(field, value)}
+                      className="w-full text-left p-2 bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 transition"
+                    >
+                      <div className="font-medium text-xs text-purple-900">{formatFieldName(field)}</div>
+                      <div className="text-xs text-gray-600 truncate">{value}</div>
+                    </button>
+                  ))}
+                  {Object.keys(companyInfo).length === 0 && (
+                    <div className="text-xs text-gray-400 p-2">
+                      Add company details in Settings
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Variables Section */}
               <div className="pt-4 border-t">
                 <div className="flex justify-between items-center mb-3">
@@ -303,9 +346,9 @@ Best regards,
                 <h4 className="font-semibold mb-2">💡 Quick Tips:</h4>
                 <ul className="text-sm space-y-1 text-gray-700">
                   <li>• Use <code className="bg-white px-1 rounded">{'{{variable_name}}'}</code> to insert dynamic content</li>
-                  <li>• Variables will be replaced with actual values during document generation</li>
-                  <li>• Add variables from the left panel and click "Insert" to use them</li>
-                  <li>• Formatting options will apply to the entire document</li>
+                  <li>• Click company details buttons to insert static info</li>
+                  <li>• Variables will be replaced with actual values during generation</li>
+                  <li>• Add custom company fields in Settings page</li>
                 </ul>
               </div>
             </div>
