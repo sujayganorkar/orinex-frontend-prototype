@@ -78,9 +78,6 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-4 gap-6 mb-8">
           {stats.map((stat, idx) => (
             <div key={idx} className="bg-white p-6 rounded-lg shadow-md">
-              <div className={`w-12 h-12 ${stat.color} rounded-lg mb-3 flex items-center justify-center text-white text-xl font-bold`}>
-                {stat.value.charAt(0)}
-              </div>
               <h3 className="text-sm text-gray-500 mb-2">{stat.title}</h3>
               <p className="text-2xl font-bold text-primary">{stat.value}</p>
             </div>
