@@ -17,6 +17,7 @@ const Settings: React.FC = () => {
   const [newFieldName, setNewFieldName] = useState('');
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editFieldName, setEditFieldName] = useState('');
+  const [isCompanyInfoExpanded, setIsCompanyInfoExpanded] = useState(true);
 
   const [automationSettings, setAutomationSettings] = useState({
     quotationGeneration: true,
@@ -92,71 +93,84 @@ const Settings: React.FC = () => {
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Company Information</h2>
+          <div 
+            className="flex justify-between items-center mb-4 cursor-pointer"
+            onClick={() => setIsCompanyInfoExpanded(!isCompanyInfoExpanded)}
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-xl transition-transform duration-200" style={{ transform: isCompanyInfoExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+                ▶
+              </span>
+              <h2 className="text-xl font-semibold">Company Information</h2>
+            </div>
             <button
-              onClick={() => setShowAddFieldModal(true)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowAddFieldModal(true);
+              }}
               className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
             >
               + Add Field
             </button>
           </div>
           
-          <div className="space-y-4">
-            {Object.entries(companyInfo).map(([field, value]) => (
-              <div key={field}>
-                <div className="flex justify-between items-center mb-2">
-                  {editingField === field ? (
-                    <input
-                      type="text"
-                      value={editFieldName}
-                      onChange={(e) => setEditFieldName(e.target.value)}
-                      onBlur={() => handleRenameField(field, editFieldName)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleRenameField(field, editFieldName)}
-                      className="flex-1 px-2 py-1 border-2 border-primary rounded font-medium"
-                      autoFocus
+          {isCompanyInfoExpanded && (
+            <div className="space-y-4">
+              {Object.entries(companyInfo).map(([field, value]) => (
+                <div key={field}>
+                  <div className="flex justify-between items-center mb-2">
+                    {editingField === field ? (
+                      <input
+                        type="text"
+                        value={editFieldName}
+                        onChange={(e) => setEditFieldName(e.target.value)}
+                        onBlur={() => handleRenameField(field, editFieldName)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleRenameField(field, editFieldName)}
+                        className="flex-1 px-2 py-1 border-2 border-primary rounded font-medium"
+                        autoFocus
+                      />
+                    ) : (
+                      <label className="block font-medium">{formatFieldName(field)}</label>
+                    )}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setEditingField(field);
+                          setEditFieldName(formatFieldName(field));
+                        }}
+                        className="text-blue-500 hover:text-blue-700 text-sm"
+                      >
+                        Edit
+                      </button>
+                      {!['name', 'address', 'gstin'].includes(field) && (
+                        <button
+                          onClick={() => handleDeleteField(field)}
+                          className="text-red-500 hover:text-red-700 text-sm"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  {field === 'address' ? (
+                    <textarea 
+                      value={value}
+                      onChange={(e) => handleCompanyInfoChange(field, e.target.value)}
+                      className="w-full px-3 py-2 border rounded-md"
+                      rows={3}
                     />
                   ) : (
-                    <label className="block font-medium">{formatFieldName(field)}</label>
+                    <input 
+                      type="text" 
+                      value={value}
+                      onChange={(e) => handleCompanyInfoChange(field, e.target.value)}
+                      className="w-full px-3 py-2 border rounded-md"
+                    />
                   )}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        setEditingField(field);
-                        setEditFieldName(formatFieldName(field));
-                      }}
-                      className="text-blue-500 hover:text-blue-700 text-sm"
-                    >
-                      Edit
-                    </button>
-                    {!['name', 'address', 'gstin'].includes(field) && (
-                      <button
-                        onClick={() => handleDeleteField(field)}
-                        className="text-red-500 hover:text-red-700 text-sm"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
                 </div>
-                {field === 'address' ? (
-                  <textarea 
-                    value={value}
-                    onChange={(e) => handleCompanyInfoChange(field, e.target.value)}
-                    className="w-full px-3 py-2 border rounded-md"
-                    rows={3}
-                  />
-                ) : (
-                  <input 
-                    type="text" 
-                    value={value}
-                    onChange={(e) => handleCompanyInfoChange(field, e.target.value)}
-                    className="w-full px-3 py-2 border rounded-md"
-                  />
-                )}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
