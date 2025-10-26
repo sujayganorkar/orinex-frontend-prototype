@@ -6,23 +6,73 @@ import ProgressBar from '@/components/ProgressBar';
 const OrderDetail: React.FC = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('quotation');
-  const [workflowProgress, setWorkflowProgress] = useState(65);
 
-  // Get order status from URL params or set default
+  // Get order data from URL params
+  const orderId = router.query.id as string || 'ORD-2024-001';
   const orderStatus = router.query.status as string || 'pending';
+  const clientName = router.query.client as string || 'Unknown Client';
 
-  const orderData = {
-    id: 'ORD-2024-001',
-    client: 'Sharma Metal Works',
-    email: 'sharma.metalworks@gmail.com',
-    date: '2024-03-15',
-    status: orderStatus,
-    items: [
-      { description: 'Precision Machined Components - MS Rod 25mm', quantity: 100, unitPrice: 450, total: 45000 },
-      { description: 'Surface Treatment - Zinc Plating', quantity: 100, unitPrice: 25, total: 2500 }
-    ],
-    totalAmount: 47500
+  // Different order data based on order ID
+  const getOrderData = (id: string) => {
+    switch(id) {
+      case 'ORD-2024-001': // Unread order
+        return {
+          id: 'ORD-2024-001',
+          client: 'Sharma Metal Works',
+          email: 'sharma.metalworks@gmail.com',
+          date: '2024-03-15',
+          status: 'unread',
+          workflowProgress: 25,
+          items: [
+            { description: 'MS Round Bar 20mm x 6m', quantity: 50, unitPrice: 180, total: 9000 },
+            { description: 'Cutting & Threading Service', quantity: 50, unitPrice: 35, total: 1750 }
+          ],
+          totalAmount: 10750
+        };
+      case 'ORD-2024-002': // Pending order
+        return {
+          id: 'ORD-2024-002',
+          client: 'Sai Engineering',
+          email: 'orders@saiengineering.com',
+          date: '2024-03-14',
+          status: 'pending',
+          workflowProgress: 75,
+          items: [
+            { description: 'Custom Machined Components - Aluminum', quantity: 25, unitPrice: 850, total: 21250 },
+            { description: 'Anodizing Treatment', quantity: 25, unitPrice: 120, total: 3000 }
+          ],
+          totalAmount: 24250
+        };
+      case 'ORD-2024-003': // Completed order
+        return {
+          id: 'ORD-2024-003',
+          client: 'Patel Fabricators',
+          email: 'purchase@patelfab.co.in',
+          date: '2024-03-13',
+          status: 'completed',
+          workflowProgress: 100,
+          items: [
+            { description: 'Steel Plates 10mm x 1200x2400', quantity: 10, unitPrice: 2500, total: 25000 },
+            { description: 'Plasma Cutting Service', quantity: 10, unitPrice: 300, total: 3000 },
+            { description: 'Edge Finishing', quantity: 10, unitPrice: 150, total: 1500 }
+          ],
+          totalAmount: 29500
+        };
+      default:
+        return {
+          id: orderId,
+          client: clientName,
+          email: 'contact@example.com',
+          date: '2024-03-15',
+          status: orderStatus,
+          workflowProgress: 50,
+          items: [],
+          totalAmount: 0
+        };
+    }
   };
+
+  const orderData = getOrderData(orderId);
 
   const tabs = [
     { id: 'quotation', label: 'Quotation', icon: '📄' },
@@ -64,7 +114,7 @@ const OrderDetail: React.FC = () => {
 
           {/* Workflow Progress */}
           {orderData.status !== 'completed' && (
-            <ProgressBar progress={workflowProgress} label="Workflow Progress" color="primary" />
+            <ProgressBar progress={orderData.workflowProgress} label="Workflow Progress" color="primary" />
           )}
           {orderData.status === 'completed' && (
             <ProgressBar progress={100} label="Order Completed" color="success" />
@@ -155,43 +205,69 @@ Best regards,"
                 <span className="text-green-600 text-2xl">✓</span>
                 <div className="flex-1">
                   <div className="font-semibold">Order Received</div>
-                  <div className="text-sm text-gray-500">Completed 2 hours ago</div>
+                  <div className="text-sm text-gray-500">
+                    {orderData.status === 'unread' && 'Just received'}
+                    {orderData.status === 'pending' && 'Completed 2 hours ago'}
+                    {orderData.status === 'completed' && 'Completed 2 days ago'}
+                  </div>
                 </div>
               </div>
+              
+              {/* Quotation step */}
               <div className={`flex items-center gap-3 p-3 rounded ${
-                orderData.status === 'completed' ? 'bg-green-50' : 'bg-blue-50'
+                orderData.status === 'unread' ? 'bg-blue-50' : 'bg-green-50'
               }`}>
                 <span className={`text-2xl ${
-                  orderData.status === 'completed' ? 'text-green-600' : 'text-blue-600'
+                  orderData.status === 'unread' ? 'text-blue-600' : 'text-green-600'
                 }`}>
-                  {orderData.status === 'completed' ? '✓' : '⏳'}
+                  {orderData.status === 'unread' ? '⏳' : '✓'}
                 </span>
                 <div className="flex-1">
                   <div className="font-semibold">Quotation Generation</div>
                   <div className="text-sm text-gray-500">
-                    {orderData.status === 'completed' ? 'Completed' : 'In progress...'}
+                    {orderData.status === 'unread' && 'Analyzing requirements...'}
+                    {orderData.status === 'pending' && 'Generated - awaiting approval'}
+                    {orderData.status === 'completed' && 'Approved and sent'}
                   </div>
                 </div>
               </div>
+
+              {/* Email step */}
               <div className={`flex items-center gap-3 p-3 rounded ${
-                orderData.status === 'completed' ? 'bg-green-50' : 'bg-gray-50'
+                orderData.status === 'completed' ? 'bg-green-50' : 
+                orderData.status === 'pending' ? 'bg-blue-50' : 'bg-gray-50'
               }`}>
                 <span className={`text-2xl ${
-                  orderData.status === 'completed' ? 'text-green-600' : 'text-gray-400'
+                  orderData.status === 'completed' ? 'text-green-600' : 
+                  orderData.status === 'pending' ? 'text-blue-600' : 'text-gray-400'
                 }`}>
-                  {orderData.status === 'completed' ? '✓' : '○'}
+                  {orderData.status === 'completed' ? '✓' : 
+                   orderData.status === 'pending' ? '⏳' : '○'}
                 </span>
                 <div className="flex-1">
                   <div className={`font-semibold ${
-                    orderData.status === 'completed' ? '' : 'text-gray-400'
+                    orderData.status === 'unread' ? 'text-gray-400' : ''
                   }`}>
-                    Send Email
+                    Email Communication
                   </div>
                   <div className="text-sm text-gray-500">
-                    {orderData.status === 'completed' ? 'Completed' : 'Pending'}
+                    {orderData.status === 'unread' && 'Pending'}
+                    {orderData.status === 'pending' && 'Ready to send'}
+                    {orderData.status === 'completed' && 'Sent and confirmed'}
                   </div>
                 </div>
               </div>
+
+              {/* Delivery step (only for completed) */}
+              {orderData.status === 'completed' && (
+                <div className="flex items-center gap-3 p-3 bg-green-50 rounded">
+                  <span className="text-green-600 text-2xl">✓</span>
+                  <div className="flex-1">
+                    <div className="font-semibold">Order Delivered</div>
+                    <div className="text-sm text-gray-500">Completed 1 day ago</div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -200,19 +276,45 @@ Best regards,"
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold mb-4">Order History</h2>
             <div className="space-y-2">
-              <div className="p-3 border-l-4 border-blue-500 bg-gray-50">
-                <div className="font-semibold">Order received</div>
-                <div className="text-sm text-gray-500">2 hours ago</div>
-              </div>
-              <div className="p-3 border-l-4 border-yellow-500 bg-gray-50">
-                <div className="font-semibold">Processing started</div>
-                <div className="text-sm text-gray-500">1 hour ago</div>
-              </div>
-              {orderData.status === 'completed' && (
-                <div className="p-3 border-l-4 border-green-500 bg-gray-50">
-                  <div className="font-semibold">Order completed</div>
-                  <div className="text-sm text-gray-500">30 minutes ago</div>
+              {orderData.status === 'unread' && (
+                <div className="p-3 border-l-4 border-blue-500 bg-gray-50">
+                  <div className="font-semibold">Order received</div>
+                  <div className="text-sm text-gray-500">10 minutes ago</div>
                 </div>
+              )}
+              
+              {orderData.status === 'pending' && (
+                <>
+                  <div className="p-3 border-l-4 border-blue-500 bg-gray-50">
+                    <div className="font-semibold">Order received</div>
+                    <div className="text-sm text-gray-500">2 hours ago</div>
+                  </div>
+                  <div className="p-3 border-l-4 border-yellow-500 bg-gray-50">
+                    <div className="font-semibold">Quotation generated</div>
+                    <div className="text-sm text-gray-500">45 minutes ago</div>
+                  </div>
+                </>
+              )}
+
+              {orderData.status === 'completed' && (
+                <>
+                  <div className="p-3 border-l-4 border-blue-500 bg-gray-50">
+                    <div className="font-semibold">Order received</div>
+                    <div className="text-sm text-gray-500">2 days ago</div>
+                  </div>
+                  <div className="p-3 border-l-4 border-yellow-500 bg-gray-50">
+                    <div className="font-semibold">Quotation sent</div>
+                    <div className="text-sm text-gray-500">2 days ago</div>
+                  </div>
+                  <div className="p-3 border-l-4 border-purple-500 bg-gray-50">
+                    <div className="font-semibold">Quotation approved</div>
+                    <div className="text-sm text-gray-500">1 day ago</div>
+                  </div>
+                  <div className="p-3 border-l-4 border-green-500 bg-gray-50">
+                    <div className="font-semibold">Order completed & delivered</div>
+                    <div className="text-sm text-gray-500">1 day ago</div>
+                  </div>
+                </>
               )}
             </div>
           </div>
