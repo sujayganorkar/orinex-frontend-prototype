@@ -51,16 +51,6 @@ const Dashboard: React.FC = () => {
     }
   ]);
 
-  const getStatColor = (color: string) => {
-    const colors = {
-      blue: 'from-blue-500 to-blue-600',
-      green: 'from-green-500 to-green-600',
-      orange: 'from-orange-500 to-orange-600',
-      purple: 'from-purple-500 to-purple-600'
-    };
-    return colors[color as keyof typeof colors];
-  };
-
   const getPriorityColor = (priority: Order['priority']) => {
     switch(priority) {
       case 'high': return 'bg-red-100 text-red-700 border-red-200';
@@ -102,15 +92,10 @@ const Dashboard: React.FC = () => {
           {stats.map((stat, idx) => (
             <div key={idx} className="bg-white rounded-xl shadow-card border border-gray-100 overflow-hidden">
               <div className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-                    <p className="text-sm text-green-600 mt-1">{stat.change}</p>
-                  </div>
-                  <div className={`w-12 h-12 bg-gradient-to-br ${getStatColor(stat.color)} rounded-lg flex items-center justify-center text-white font-bold`}>
-                    {stat.title.charAt(0)}
-                  </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                  <p className="text-sm text-green-600 mt-1">{stat.change}</p>
                 </div>
               </div>
             </div>
@@ -173,7 +158,6 @@ const Dashboard: React.FC = () => {
                   <Link href="/templates">
                     <button className="w-full p-3 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors group">
                       <div className="flex items-center space-x-3">
-                        <span className="text-blue-600 text-xl w-8 h-8 flex items-center justify-center bg-white rounded font-bold">T</span>
                         <div>
                           <div className="font-medium text-gray-900 group-hover:text-blue-900">Create Template</div>
                           <div className="text-sm text-gray-600">Design new documents</div>
@@ -184,7 +168,6 @@ const Dashboard: React.FC = () => {
                   <Link href="/workflows">
                     <button className="w-full p-3 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors group">
                       <div className="flex items-center space-x-3">
-                        <span className="text-green-600 text-xl w-8 h-8 flex items-center justify-center bg-white rounded font-bold">W</span>
                         <div>
                           <div className="font-medium text-gray-900 group-hover:text-green-900">Build Workflow</div>
                           <div className="text-sm text-gray-600">Automate processes</div>
@@ -195,7 +178,6 @@ const Dashboard: React.FC = () => {
                   <Link href="/orders">
                     <button className="w-full p-3 text-left bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors group">
                       <div className="flex items-center space-x-3">
-                        <span className="text-purple-600 text-xl w-8 h-8 flex items-center justify-center bg-white rounded font-bold">O</span>
                         <div>
                           <div className="font-medium text-gray-900 group-hover:text-purple-900">View Orders</div>
                           <div className="text-sm text-gray-600">Manage all orders</div>
