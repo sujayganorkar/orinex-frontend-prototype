@@ -6,33 +6,49 @@ const Sidebar: React.FC = () => {
   const router = useRouter();
 
   const navItems = [
-    { href: '/dashboard', label: 'Dashboard' },
-    { href: '/orders', label: 'Orders' },
-    { href: '/templates', label: 'Templates' },
-    { href: '/workflows', label: 'Workflows' },
-    { href: '/settings', label: 'Settings' }
+    { href: '/dashboard', label: 'Dashboard', icon: '📊' },
+    { href: '/orders', label: 'Orders', icon: '📋' },
+    { href: '/templates', label: 'Templates', icon: '📄' },
+    { href: '/workflows', label: 'Workflows', icon: '⚡' },
+    { href: '/settings', label: 'Settings', icon: '⚙️' }
   ];
 
   return (
-    <div className="w-64 bg-primary text-white flex flex-col p-6">
-      <div className="text-2xl font-bold text-center mb-10">ORINEX</div>
+    <div className="fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-gray-100 z-10">
+      {/* Header */}
+      <div className="h-16 flex items-center justify-center border-b border-gray-100">
+        <div className="text-2xl font-bold text-primary">ORINEX</div>
+      </div>
       
-      <nav className="space-y-2 flex-grow">
-        {navItems.map((item) => (
-          <Link 
-            key={item.href} 
-            href={item.href}
-            className={`
-              flex items-center p-3 rounded-md transition-colors 
-              ${router.pathname === item.href 
-                ? 'bg-secondary-light' 
-                : 'hover:bg-primary-light'}
-            `}
-          >
-            {item.label}
-          </Link>
-        ))}
+      {/* Navigation */}
+      <nav className="p-4 space-y-1">
+        {navItems.map((item) => {
+          const isActive = router.pathname === item.href;
+          return (
+            <Link 
+              key={item.href} 
+              href={item.href}
+              className={`
+                group flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150
+                ${isActive 
+                  ? 'bg-primary text-white shadow-md' 
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
+              `}
+            >
+              <span className="mr-3 text-lg">{item.icon}</span>
+              {item.label}
+            </Link>
+          )
+        })}
       </nav>
+
+      {/* Footer */}
+      <div className="absolute bottom-4 left-4 right-4">
+        <div className="p-3 bg-blue-50 rounded-lg">
+          <div className="text-xs font-medium text-blue-900">Need Help?</div>
+          <div className="text-xs text-blue-700 mt-1">Contact support</div>
+        </div>
+      </div>
     </div>
   );
 };
