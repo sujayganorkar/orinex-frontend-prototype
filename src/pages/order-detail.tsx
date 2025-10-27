@@ -75,10 +75,10 @@ const OrderDetail: React.FC = () => {
   const orderData = getOrderData(orderId);
 
   const tabs = [
-    { id: 'quotation', label: 'Quotation', icon: '📄' },
-    { id: 'email', label: 'Email', icon: '✉️' },
-    { id: 'workflow', label: 'Workflow', icon: '🔄' },
-    { id: 'history', label: 'History', icon: '📋' }
+    { id: 'quotation', label: 'Quotation', icon: 'Q' },
+    { id: 'email', label: 'Email', icon: 'E' },
+    { id: 'workflow', label: 'Workflow', icon: 'W' },
+    { id: 'history', label: 'History', icon: 'H' }
   ];
 
   return (
@@ -133,7 +133,9 @@ const OrderDetail: React.FC = () => {
                   : 'text-gray-600'
               }`}
             >
-              <span>{tab.icon}</span>
+              <span className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded text-xs font-bold">
+                {tab.icon}
+              </span>
               {tab.label}
             </button>
           ))}
@@ -220,7 +222,7 @@ Best regards,"
                 <span className={`text-2xl ${
                   orderData.status === 'unread' ? 'text-blue-600' : 'text-green-600'
                 }`}>
-                  {orderData.status === 'unread' ? '⏳' : '✓'}
+                  {orderData.status === 'unread' ? 'P' : '✓'}
                 </span>
                 <div className="flex-1">
                   <div className="font-semibold">Quotation Generation</div>
@@ -242,7 +244,7 @@ Best regards,"
                   orderData.status === 'pending' ? 'text-blue-600' : 'text-gray-400'
                 }`}>
                   {orderData.status === 'completed' ? '✓' : 
-                   orderData.status === 'pending' ? '⏳' : '○'}
+                   orderData.status === 'pending' ? 'P' : 'O'}
                 </span>
                 <div className="flex-1">
                   <div className={`font-semibold ${
