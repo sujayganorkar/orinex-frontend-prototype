@@ -5,7 +5,11 @@ import Link from 'next/link';
 const Orders: React.FC = () => {
   const [activeTab, setActiveTab] = useState('Unread');
 
-  const tabs = ['Unread', 'Pending', 'Completed'];
+  const tabs = [
+    { id: 'Unread', label: 'Unread', count: 3 },
+    { id: 'Pending', label: 'Pending', count: 5 },
+    { id: 'Completed', label: 'Completed', count: 12 }
+  ];
 
   const orders = [
     { 
@@ -14,7 +18,8 @@ const Orders: React.FC = () => {
       summary: 'New order inquiry', 
       time: '10 min ago',
       status: 'unread',
-      badge: 3
+      amount: '₹10,750',
+      priority: 'high'
     },
     { 
       id: 'ORD-2024-002',
@@ -22,7 +27,8 @@ const Orders: React.FC = () => {
       summary: 'Quotation ready for review', 
       time: '45 min ago',
       status: 'pending',
-      badge: 5
+      amount: '₹24,250',
+      priority: 'medium'
     },
     { 
       id: 'ORD-2024-003',
@@ -30,7 +36,8 @@ const Orders: React.FC = () => {
       summary: 'Order completed and delivered', 
       time: '1 day ago',
       status: 'completed',
-      badge: 0
+      amount: '₹29,500',
+      priority: 'medium'
     }
   ];
 
@@ -41,89 +48,196 @@ const Orders: React.FC = () => {
     return true;
   });
 
+  const getStatusColor = (status: string) => {
+    switch(status) {
+      case 'unread': return 'bg-blue-100 text-blue-700';
+      case 'pending': return 'bg-yellow-100 text-yellow-700';
+      case 'completed': return 'bg-green-100 text-green-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch(priority) {
+      case 'high': return 'bg-red-100 text-red-700';
+      case 'medium': return 'bg-yellow-100 text-yellow-700';
+      case 'low': return 'bg-green-100 text-green-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
   return (
     <Layout>
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Order Management</h1>
-          <div className="relative">
-            <input 
-              type="text" 
-              placeholder="Search orders..."
-              className="w-80 px-4 py-2 rounded-full border border-gray-300"
-            />
+      <div className="p-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Order Management</h1>
+              <p className="text-gray-600 mt-1">Track and manage all your customer orders</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <input 
+                  type="text" 
+                  placeholder="Search orders..."
+                  className="w-80 pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:border-primary focus:outline-none transition-colors"
+                />
+                <span className="absolute left-3 top-3 text-gray-400">🔍</span>
+              </div>
+              <button className="px-4 py-2.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
+                Export
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="flex border-b mb-6">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`
-                px-4 py-2 relative
-                ${activeTab === tab 
-                  ? 'text-primary font-bold border-b-2 border-primary' 
-                  : 'text-gray-600'}
-              `}
-            >
-              {tab}
-              {tab === 'Unread' && <span className="ml-2 bg-primary text-white rounded-full px-2 py-1 text-xs">3</span>}
-              {tab === 'Pending' && <span className="ml-2 bg-primary text-white rounded-full px-2 py-1 text-xs">5</span>}
-            </button>
-          ))}
-        </div>
-
-        <div className="space-y-4">
-          {filteredOrders.map((order, index) => (
-            <div 
-              key={index} 
-              className="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center hover:shadow-md transition-shadow"
-            >
+        {/* Stats Cards */}
+        <div className="grid grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow-card border border-gray-100 p-6">
+            <div className="flex items-center justify-between">
               <div>
-                <div className="font-bold">{order.client}</div>
-                <div className="text-sm text-gray-500">{order.summary} - {order.time}</div>
-                <div className="text-xs text-gray-400 mt-1">Order ID: {order.id}</div>
+                <p className="text-sm font-medium text-gray-600">Total Today</p>
+                <p className="text-2xl font-bold text-gray-900">8</p>
               </div>
-              <div className="flex gap-2">
-                <Link href={`/order-detail?id=${order.id}&status=${order.status}&client=${encodeURIComponent(order.client)}`}>
-                  <button className={`px-4 py-2 rounded-md transition ${
-                    order.status === 'completed' 
-                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
-                      : 'bg-primary text-white hover:bg-primary-dark'
-                  }`}>
-                    {order.status === 'completed' ? 'View Details' : 'Process Now'}
-                  </button>
-                </Link>
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <span className="text-blue-600">📊</span>
               </div>
             </div>
-          ))}
+          </div>
+          <div className="bg-white rounded-xl shadow-card border border-gray-100 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Processed</p>
+                <p className="text-2xl font-bold text-gray-900">5</p>
+              </div>
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <span className="text-green-600">✅</span>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow-card border border-gray-100 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Pending Action</p>
+                <p className="text-2xl font-bold text-gray-900">3</p>
+              </div>
+              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                <span className="text-orange-600">⏱️</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {filteredOrders.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 text-lg mb-2">No orders in {activeTab.toLowerCase()}</div>
-            <div className="text-gray-500 text-sm">
-              {activeTab === 'Unread' && 'New orders will appear here when they arrive'}
-              {activeTab === 'Pending' && 'Orders waiting for action will be shown here'}
-              {activeTab === 'Completed' && 'Completed orders will be listed here'}
-            </div>
+        {/* Orders Table */}
+        <div className="bg-white rounded-xl shadow-card border border-gray-100">
+          {/* Tabs */}
+          <div className="border-b border-gray-100">
+            <nav className="flex px-6">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`py-4 px-4 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === tab.id
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  {tab.label}
+                  <span className="ml-2 px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
+                    {tab.count}
+                  </span>
+                </button>
+              ))}
+            </nav>
           </div>
-        )}
 
-        {/* Quick Stats */}
-        <div className="mt-8 grid grid-cols-3 gap-4">
-          <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-            <div className="text-2xl font-bold text-primary">8</div>
-            <div className="text-sm text-gray-600">Total Today</div>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-            <div className="text-2xl font-bold text-green-600">5</div>
-            <div className="text-sm text-gray-600">Processed</div>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-            <div className="text-2xl font-bold text-orange-600">3</div>
-            <div className="text-sm text-gray-600">Pending Action</div>
+          {/* Table Content */}
+          <div className="overflow-hidden">
+            {filteredOrders.length > 0 ? (
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Order
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Client
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Priority
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Time
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredOrders.map((order) => (
+                    <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{order.id}</div>
+                          <div className="text-sm text-gray-500">{order.summary}</div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{order.client}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(order.priority)}`}>
+                          {order.priority.charAt(0).toUpperCase() + order.priority.slice(1)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {order.amount}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {order.time}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <Link href={`/order-detail?id=${order.id}&status=${order.status}&client=${encodeURIComponent(order.client)}`}>
+                          <button className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                            order.status === 'completed'
+                              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              : 'bg-primary text-white hover:bg-primary-dark'
+                          }`}>
+                            {order.status === 'completed' ? 'View' : 'Process'}
+                          </button>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="p-12 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                  <span className="text-2xl text-gray-400">📋</span>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No orders in {activeTab.toLowerCase()}</h3>
+                <p className="text-gray-500">
+                  {activeTab === 'Unread' && 'New orders will appear here when they arrive'}
+                  {activeTab === 'Pending' && 'Orders waiting for action will be shown here'}
+                  {activeTab === 'Completed' && 'Completed orders will be listed here'}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
