@@ -15,10 +15,10 @@ interface Order {
 
 const Dashboard: React.FC = () => {
   const stats = [
-    { title: 'Orders Today', value: '12', change: '+8%', color: 'blue', icon: 'chart' },
-    { title: 'Active Workflows', value: '3', change: '+1', color: 'green', icon: 'workflow' },
-    { title: 'Pending Actions', value: '5', change: '-2', color: 'orange', icon: 'clock' },
-    { title: 'Revenue (MTD)', value: '₹2.45L', change: '+15%', color: 'purple', icon: 'currency' }
+    { title: 'Orders Today', value: '12', change: '+8%', color: 'blue' },
+    { title: 'Active Workflows', value: '3', change: '+1', color: 'green' },
+    { title: 'Pending Actions', value: '5', change: '-2', color: 'orange' },
+    { title: 'Revenue (MTD)', value: '₹2.45L', change: '+15%', color: 'purple' }
   ];
 
   const [recentOrders] = useState<Order[]>([
@@ -49,7 +49,7 @@ const Dashboard: React.FC = () => {
       status: 'unread',
       progress: 0
     }
-  ];
+  ]);
 
   const getStatColor = (color: string) => {
     const colors = {
@@ -66,21 +66,6 @@ const Dashboard: React.FC = () => {
       case 'high': return 'bg-red-100 text-red-700 border-red-200';
       case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
       case 'low': return 'bg-green-100 text-green-700 border-green-200';
-    }
-  };
-
-  const renderStatIcon = (icon: string) => {
-    switch(icon) {
-      case 'chart':
-        return <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>;
-      case 'workflow':
-        return <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>;
-      case 'clock':
-        return <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
-      case 'currency':
-        return <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" /></svg>;
-      default:
-        return <div className="w-6 h-6 bg-white bg-opacity-30 rounded"></div>;
     }
   };
 
@@ -101,9 +86,7 @@ const Dashboard: React.FC = () => {
                   placeholder="Search orders..."
                   className="w-80 pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:border-primary focus:outline-none transition-colors"
                 />
-                <svg className="absolute left-3 top-3 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+                <span className="absolute left-3 top-3 text-gray-400">Search</span>
               </div>
               <Link href="/help">
                 <button className="px-4 py-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
@@ -125,8 +108,8 @@ const Dashboard: React.FC = () => {
                     <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
                     <p className="text-sm text-green-600 mt-1">{stat.change}</p>
                   </div>
-                  <div className={`w-12 h-12 bg-gradient-to-br ${getStatColor(stat.color)} rounded-lg flex items-center justify-center text-white`}>
-                    {renderStatIcon(stat.icon)}
+                  <div className={`w-12 h-12 bg-gradient-to-br ${getStatColor(stat.color)} rounded-lg flex items-center justify-center text-white font-bold`}>
+                    {stat.title.charAt(0)}
                   </div>
                 </div>
               </div>
@@ -190,9 +173,7 @@ const Dashboard: React.FC = () => {
                   <Link href="/templates">
                     <button className="w-full p-3 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors group">
                       <div className="flex items-center space-x-3">
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
+                        <span className="text-blue-600 text-xl w-8 h-8 flex items-center justify-center bg-white rounded font-bold">T</span>
                         <div>
                           <div className="font-medium text-gray-900 group-hover:text-blue-900">Create Template</div>
                           <div className="text-sm text-gray-600">Design new documents</div>
@@ -203,9 +184,7 @@ const Dashboard: React.FC = () => {
                   <Link href="/workflows">
                     <button className="w-full p-3 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors group">
                       <div className="flex items-center space-x-3">
-                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
+                        <span className="text-green-600 text-xl w-8 h-8 flex items-center justify-center bg-white rounded font-bold">W</span>
                         <div>
                           <div className="font-medium text-gray-900 group-hover:text-green-900">Build Workflow</div>
                           <div className="text-sm text-gray-600">Automate processes</div>
@@ -216,9 +195,7 @@ const Dashboard: React.FC = () => {
                   <Link href="/orders">
                     <button className="w-full p-3 text-left bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors group">
                       <div className="flex items-center space-x-3">
-                        <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
+                        <span className="text-purple-600 text-xl w-8 h-8 flex items-center justify-center bg-white rounded font-bold">O</span>
                         <div>
                           <div className="font-medium text-gray-900 group-hover:text-purple-900">View Orders</div>
                           <div className="text-sm text-gray-600">Manage all orders</div>
