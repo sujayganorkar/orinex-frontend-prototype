@@ -33,10 +33,10 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
   }, [showTemplateModal]);
 
   const blockTypes = [
-    { type: 'template', icon: '📄', label: 'Generate Document', color: 'bg-blue-100' },
-    { type: 'condition', icon: '🔀', label: 'Condition', color: 'bg-yellow-100' },
-    { type: 'action', icon: '⚡', label: 'Action', color: 'bg-green-100' },
-    { type: 'delay', icon: '⏱️', label: 'Delay', color: 'bg-purple-100' }
+    { type: 'template', label: 'Generate Document', color: 'bg-blue-100' },
+    { type: 'condition', label: 'Condition', color: 'bg-yellow-100' },
+    { type: 'action', label: 'Action', color: 'bg-green-100' },
+    { type: 'delay', label: 'Delay', color: 'bg-purple-100' }
   ];
 
   const handleDragStart = (blockType: string) => {
@@ -137,8 +137,8 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
     onSave(workflow);
   };
 
-  const getBlockIcon = (type: string) => {
-    return blockTypes.find(b => b.type === type)?.icon || '📦';
+  const getBlockLabel = (type: string) => {
+    return blockTypes.find(b => b.type === type)?.label || 'Block';
   };
 
   const getBlockColor = (type: string) => {
@@ -192,7 +192,9 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
                   className={`${blockType.color} p-4 rounded-lg cursor-move hover:shadow-md transition-shadow`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl">{blockType.icon}</span>
+                    <span className="text-2xl w-8 h-8 flex items-center justify-center bg-white rounded">
+                      {blockType.type.charAt(0).toUpperCase()}
+                    </span>
                     <div>
                       <div className="font-semibold text-sm">{blockType.label}</div>
                       <div className="text-xs text-gray-600">
@@ -208,7 +210,7 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
             </div>
 
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-              <h4 className="font-semibold text-sm mb-2">💡 How to Use:</h4>
+              <h4 className="font-semibold text-sm mb-2">How to Use:</h4>
               <ul className="text-xs space-y-1 text-gray-700">
                 <li>• Drag blocks to canvas</li>
                 <li>• Click to configure</li>
@@ -231,7 +233,9 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
             {blocks.length === 0 && (
               <div className="absolute inset-0 flex items-center justify-center text-gray-400">
                 <div className="text-center">
-                  <div className="text-4xl mb-4">🎨</div>
+                  <div className="text-4xl mb-4 w-16 h-16 bg-gray-200 rounded mx-auto flex items-center justify-center">
+                    W
+                  </div>
                   <div className="text-lg font-semibold">Drag blocks here to build your workflow</div>
                   <div className="text-sm mt-2">Start by dragging a "Generate Document" block</div>
                 </div>
@@ -246,8 +250,8 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
                     selectedBlock === block.id ? 'ring-4 ring-primary' : ''
                   }`}
                   style={{
-                    left: block.x,
-                    top: block.y,
+                    left: `${block.x}px`,
+                    top: `${block.y}px`,
                     minWidth: '180px'
                   }}
                   onClick={() => setSelectedBlock(block.id)}
@@ -259,9 +263,11 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">{getBlockIcon(block.type)}</span>
+                      <span className="text-2xl w-8 h-8 flex items-center justify-center bg-white rounded">
+                        {block.type.charAt(0).toUpperCase()}
+                      </span>
                       <span className="font-semibold text-sm">
-                        {blockTypes.find(b => b.type === block.type)?.label}
+                        {getBlockLabel(block.type)}
                       </span>
                     </div>
                     <button
@@ -269,9 +275,9 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
                         e.stopPropagation();
                         handleBlockDelete(block.id);
                       }}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-red-500 hover:text-red-700 w-6 h-6 flex items-center justify-center"
                     >
-                      ✕
+                      ×
                     </button>
                   </div>
                   <div className="text-xs text-gray-600">
@@ -323,7 +329,9 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
             
             {!selectedBlock && (
               <div className="text-center text-gray-400 mt-8">
-                <div className="text-4xl mb-2">⚙️</div>
+                <div className="text-4xl mb-2 w-16 h-16 bg-gray-200 rounded mx-auto flex items-center justify-center">
+                  C
+                </div>
                 <div className="text-sm">Select a block to configure</div>
               </div>
             )}
@@ -332,9 +340,11 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
               <div className="space-y-4">
                 <div className="p-4 bg-white rounded-lg border">
                   <div className="flex items-center gap-2 mb-4">
-                    <span className="text-2xl">{getBlockIcon(selectedBlockData.type)}</span>
+                    <span className="text-2xl w-8 h-8 flex items-center justify-center bg-primary text-white rounded">
+                      {selectedBlockData.type.charAt(0).toUpperCase()}
+                    </span>
                     <span className="font-semibold">
-                      {blockTypes.find(b => b.type === selectedBlockData.type)?.label}
+                      {getBlockLabel(selectedBlockData.type)}
                     </span>
                   </div>
 
@@ -483,7 +493,7 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
                 className="w-full p-4 border-2 border-dashed border-primary rounded-lg hover:bg-blue-50 transition"
               >
                 <div className="flex items-center justify-center gap-3">
-                  <span className="text-3xl">➕</span>
+                  <span className="text-3xl w-12 h-12 flex items-center justify-center bg-primary text-white rounded">+</span>
                   <div>
                     <div className="font-semibold text-primary">Create New Document from Scratch</div>
                     <div className="text-sm text-gray-600">Start with a blank document</div>
@@ -506,7 +516,7 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
                       className="p-4 border rounded-lg hover:border-primary hover:bg-blue-50 transition text-left"
                     >
                       <div className="flex items-start gap-3">
-                        <span className="text-2xl">📄</span>
+                        <span className="text-2xl w-12 h-12 flex items-center justify-center bg-gray-100 rounded">T</span>
                         <div className="flex-1">
                           <div className="font-semibold">{template.name}</div>
                           <div className="text-sm text-gray-600">{template.description || 'No description'}</div>
@@ -521,7 +531,7 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onSave, onCancel, ini
 
             {availableTemplates.length === 0 && (
               <div className="text-center text-gray-400 py-8">
-                <div className="text-4xl mb-2">📝</div>
+                <div className="text-4xl mb-2 w-16 h-16 bg-gray-200 rounded mx-auto flex items-center justify-center">T</div>
                 <div className="text-sm">No templates available</div>
                 <div className="text-xs mt-1">Create templates in the Templates page first</div>
               </div>
