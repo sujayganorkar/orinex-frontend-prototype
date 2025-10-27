@@ -35,7 +35,6 @@ const Sidebar: React.FC = () => {
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
               `}
             >
-              <span className="mr-3 text-lg w-5 h-5 flex items-center justify-center">•</span>
               {item.label}
             </Link>
           )
