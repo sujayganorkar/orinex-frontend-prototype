@@ -61,20 +61,8 @@ const Templates: React.FC = () => {
   };
 
   const getTemplateIcon = (type: string, isVisual: boolean) => {
-    if (isVisual) {
-      switch(type) {
-        case 'docx': return '🎨📄';
-        case 'pptx': return '🎨📊'; 
-        case 'xlsx': return '🎨📈';
-        default: return '🎨📄';
-      }
-    }
-    switch(type) {
-      case 'docx': return '📄';
-      case 'pptx': return '📊';
-      case 'xlsx': return '📈';
-      default: return '📄';
-    }
+    const baseIcon = type.charAt(0).toUpperCase();
+    return isVisual ? `V${baseIcon}` : baseIcon;
   };
 
   return (
@@ -106,7 +94,9 @@ const Templates: React.FC = () => {
             <div key={template.id} className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="h-40 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="text-4xl mb-2">{getTemplateIcon(template.type, template.isVisual)}</div>
+                  <div className="text-4xl mb-2 w-16 h-16 bg-white rounded-lg mx-auto flex items-center justify-center font-bold text-gray-600">
+                    {getTemplateIcon(template.type, template.isVisual)}
+                  </div>
                   <div className="text-sm text-gray-600">
                     {template.type.toUpperCase()} 
                     {template.isVisual && <span className="ml-1 text-xs bg-blue-100 text-blue-800 px-1 rounded">VISUAL</span>}
@@ -157,14 +147,14 @@ const Templates: React.FC = () => {
 
         {/* Quick Actions */}
         <div className="mt-8 bg-blue-50 rounded-lg p-6">
-          <h3 className="font-semibold mb-3">💡 Template Tips</h3>
+          <h3 className="font-semibold mb-3">Template Tips</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <div className="font-medium text-blue-900">📝 Text Editor</div>
+              <div className="font-medium text-blue-900">Text Editor</div>
               <div className="text-blue-700">Best for documents with lots of text content and simple formatting</div>
             </div>
             <div>
-              <div className="font-medium text-blue-900">🎨 Visual Designer</div>
+              <div className="font-medium text-blue-900">Visual Designer</div>
               <div className="text-blue-700">Perfect for presentations, flyers, and visually rich documents</div>
             </div>
           </div>
