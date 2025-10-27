@@ -286,27 +286,27 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({ onSave, onCancel, initi
                 {/* Toolbar */}
                 <div className="border-b p-2 bg-gray-50 flex gap-2 flex-wrap">
                   <button className="px-3 py-1 border rounded hover:bg-gray-100 text-sm">
-                    📄 New
+                    New
                   </button>
                   <button className="px-3 py-1 border rounded hover:bg-gray-100 text-sm">
-                    📁 Open
+                    Open
                   </button>
                   <button className="px-3 py-1 border rounded hover:bg-gray-100 text-sm">
-                    💾 Save
-                  </button>
-                  <div className="border-l mx-2"></div>
-                  <button className="px-3 py-1 border rounded hover:bg-gray-100 text-sm">
-                    ↩️ Undo
-                  </button>
-                  <button className="px-3 py-1 border rounded hover:bg-gray-100 text-sm">
-                    ↪️ Redo
+                    Save
                   </button>
                   <div className="border-l mx-2"></div>
                   <button className="px-3 py-1 border rounded hover:bg-gray-100 text-sm">
-                    📋 Table
+                    Undo
                   </button>
                   <button className="px-3 py-1 border rounded hover:bg-gray-100 text-sm">
-                    🖼️ Image
+                    Redo
+                  </button>
+                  <div className="border-l mx-2"></div>
+                  <button className="px-3 py-1 border rounded hover:bg-gray-100 text-sm">
+                    Table
+                  </button>
+                  <button className="px-3 py-1 border rounded hover:bg-gray-100 text-sm">
+                    Image
                   </button>
                 </div>
 
@@ -343,7 +343,7 @@ Best regards,
 
               {/* Preview Info */}
               <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-semibold mb-2">💡 Quick Tips:</h4>
+                <h4 className="font-semibold mb-2">Quick Tips:</h4>
                 <ul className="text-sm space-y-1 text-gray-700">
                   <li>• Use <code className="bg-white px-1 rounded">{'{{variable_name}}'}</code> to insert dynamic content</li>
                   <li>• Click company details buttons to insert static info</li>
