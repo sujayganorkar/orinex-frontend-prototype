@@ -66,11 +66,11 @@ const WorkflowExecutor: React.FC<WorkflowExecutorProps> = ({
 
   const getBlockIcon = (type: string) => {
     switch(type) {
-      case 'template': return '📄';
-      case 'condition': return '🔀';
-      case 'action': return '⚡';
-      case 'delay': return '⏱️';
-      default: return '📦';
+      case 'template': return 'T';
+      case 'condition': return 'C';
+      case 'action': return 'A';
+      case 'delay': return 'D';
+      default: return 'B';
     }
   };
 
@@ -94,9 +94,9 @@ const WorkflowExecutor: React.FC<WorkflowExecutorProps> = ({
     setAwaitingApproval(true);
     setPendingBlock(workflow.blocks[0]);
     
-    addLog(`🚀 Starting workflow: ${workflow.name}`);
-    addLog(`📦 Processing order: ${orderData?.id || 'N/A'}`);
-    addLog(`⏸️ Awaiting approval for step 1...`);
+    addLog(`Starting workflow: ${workflow.name}`);
+    addLog(`Processing order: ${orderData?.id || 'N/A'}`);
+    addLog(`Awaiting approval for step 1...`);
   };
 
   const handleApproveStep = async () => {
@@ -118,14 +118,14 @@ const WorkflowExecutor: React.FC<WorkflowExecutorProps> = ({
         setCurrentStep(nextStepIndex);
         setIsWorkflowComplete(true);
         setIsExecuting(false);
-        addLog(`🎉 Workflow execution completed successfully`);
+        addLog(`Workflow execution completed successfully`);
       } else {
         // Move to next step
         setCurrentStep(nextStepIndex);
         setPendingBlock(workflow.blocks[nextStepIndex]);
         setAwaitingApproval(true);
         setIsExecuting(false);
-        addLog(`⏸️ Awaiting approval for step ${nextStepIndex + 1}...`);
+        addLog(`Awaiting approval for step ${nextStepIndex + 1}...`);
       }
     } catch (error) {
       addLog(`❌ Step failed: ${error}`);
@@ -174,7 +174,9 @@ const WorkflowExecutor: React.FC<WorkflowExecutorProps> = ({
           {awaitingApproval && pendingBlock && (
             <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-3xl">{getBlockIcon(pendingBlock.type)}</span>
+                <span className="text-3xl w-12 h-12 bg-yellow-100 rounded flex items-center justify-center font-bold">
+                  {getBlockIcon(pendingBlock.type)}
+                </span>
                 <div>
                   <h3 className="font-bold text-lg">Step {currentStep + 1}: Awaiting Approval</h3>
                   <p className="text-gray-700">{getBlockDescription(pendingBlock)}</p>
@@ -206,10 +208,10 @@ const WorkflowExecutor: React.FC<WorkflowExecutorProps> = ({
             <div className="bg-green-50 p-4 rounded-lg">
               <div className="text-sm text-gray-600">Status</div>
               <div className="font-semibold">
-                {isExecuting && '⏳ Executing...'}
-                {awaitingApproval && '⏸️ Awaiting Approval'}
-                {isWorkflowComplete && '✅ Completed'}
-                {!isExecuting && !awaitingApproval && !isWorkflowComplete && '⏸️ Ready'}
+                {isExecuting && 'Executing...'}
+                {awaitingApproval && 'Awaiting Approval'}
+                {isWorkflowComplete && 'Completed'}
+                {!isExecuting && !awaitingApproval && !isWorkflowComplete && 'Ready'}
               </div>
             </div>
             <div className="bg-purple-50 p-4 rounded-lg">
@@ -235,15 +237,17 @@ const WorkflowExecutor: React.FC<WorkflowExecutorProps> = ({
                       : 'bg-gray-50 border-gray-200'
                   }`}
                 >
-                  <span className="text-2xl">{getBlockIcon(block.type)}</span>
+                  <span className="text-2xl w-12 h-12 flex items-center justify-center bg-white rounded font-bold">
+                    {getBlockIcon(block.type)}
+                  </span>
                   <div className="flex-1">
                     <div className="font-medium">Step {index + 1}: {block.config.name || 'Unnamed'}</div>
                     <div className="text-sm text-gray-600">{getBlockDescription(block)}</div>
                   </div>
                   <div className="text-right">
                     {index < currentStep && <span className="text-green-600 font-bold">✓</span>}
-                    {index === currentStep && awaitingApproval && <span className="text-yellow-600 font-bold">⏸️</span>}
-                    {index === currentStep && isExecuting && <span className="text-blue-600 font-bold">⏳</span>}
+                    {index === currentStep && awaitingApproval && <span className="text-yellow-600 font-bold">P</span>}
+                    {index === currentStep && isExecuting && <span className="text-blue-600 font-bold">E</span>}
                     {index > currentStep && <span className="text-gray-400 font-bold">○</span>}
                   </div>
                 </div>
@@ -272,11 +276,8 @@ const WorkflowExecutor: React.FC<WorkflowExecutorProps> = ({
                 {results.map((result, index) => (
                   <div key={index} className="bg-white border rounded-lg p-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">
-                        {result.type === 'template' && '📄'}
-                        {result.type === 'condition' && '🔀'}
-                        {result.type === 'action' && '⚡'}
-                        {result.type === 'delay' && '⏱️'}
+                      <span className="text-2xl w-12 h-12 flex items-center justify-center bg-gray-100 rounded font-bold">
+                        {result.type.charAt(0).toUpperCase()}
                       </span>
                       <div className="flex-1">
                         <div className="font-medium capitalize">{result.type}</div>
@@ -308,7 +309,7 @@ const WorkflowExecutor: React.FC<WorkflowExecutorProps> = ({
                 onClick={handleStartExecution}
                 className="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
               >
-                🚀 Start Execution
+                Start Execution
               </button>
             )}
             {isWorkflowComplete && (
@@ -316,7 +317,7 @@ const WorkflowExecutor: React.FC<WorkflowExecutorProps> = ({
                 onClick={handleFinish}
                 className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
               >
-                ✅ Finish & Save Results
+                Finish & Save Results
               </button>
             )}
           </div>
