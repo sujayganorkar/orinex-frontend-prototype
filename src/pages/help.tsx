@@ -218,7 +218,7 @@ Response Times:
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Help & Support</h1>
           <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition flex items-center gap-2">
-            <span>📱</span>
+            <span>W</span>
             Contact Support via WhatsApp
           </button>
         </div>
@@ -261,16 +261,16 @@ Response Times:
               <h3 className="font-semibold mb-3">Quick Actions</h3>
               <div className="space-y-2">
                 <button className="w-full text-left text-sm text-primary hover:underline">
-                  📞 Schedule a Demo Call
+                  Schedule a Demo Call
                 </button>
                 <button className="w-full text-left text-sm text-primary hover:underline">
-                  📧 Email Support Team
+                  Email Support Team
                 </button>
                 <button className="w-full text-left text-sm text-primary hover:underline">
-                  💬 Live Chat Support
+                  Live Chat Support
                 </button>
                 <button className="w-full text-left text-sm text-primary hover:underline">
-                  📱 WhatsApp Support
+                  WhatsApp Support
                 </button>
               </div>
             </div>
@@ -291,9 +291,9 @@ Response Times:
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <button className="bg-primary bg-opacity-80 text-white rounded-full p-4 hover:bg-opacity-100 transition">
-                      <svg className="w-8 h-8 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z"/>
-                      </svg>
+                      <div className="w-8 h-8 flex items-center justify-center">
+                        <span className="text-2xl">▶</span>
+                      </div>
                     </button>
                   </div>
                 </div>
