@@ -1,58 +1,207 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
-import Link from 'next/link';
+import OrderProcessingModal from '@/components/OrderProcessingModal';
+
+interface Order {
+  id: string;
+  client: string;
+  summary: string;
+  time: string;
+  status: 'unread' | 'pending' | 'quotations' | 'invoices';
+  amount: string;
+  priority: 'high' | 'medium' | 'low';
+  enquiryEmail?: string;
+  type?: 'enquiry' | 'purchase_order';
+  processedDetails?: {
+    steps: string[];
+    timestamp: Date;
+  };
+}
+
+interface SearchMatch {
+  text: string;
+  highlighted: string;
+}
 
 const Orders: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('Unread');
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState('unread');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const tabs = [
-    { id: 'Unread', label: 'Unread', count: 3 },
-    { id: 'Pending', label: 'Pending', count: 5 },
-    { id: 'Completed', label: 'Completed', count: 12 }
-  ];
-
-  const orders = [
-    { 
+  // Handle query parameter for tab selection
+  useEffect(() => {
+    if (router.isReady) {
+      const tabParam = router.query.tab as string;
+      if (tabParam && ['unread', 'pending', 'quotations', 'invoices'].includes(tabParam)) {
+        setActiveTab(tabParam);
+      }
+    }
+  }, [router.isReady, router.query.tab]);
+  const [orders, setOrders] = useState<Order[]>([
+    {
       id: 'ORD-2024-001',
-      client: 'Sharma Metal Works', 
-      summary: 'New order inquiry', 
+      client: 'Sharma Metal Works',
+      summary: 'New order inquiry',
       time: '10 min ago',
       status: 'unread',
       amount: '₹10,750',
-      priority: 'high'
+      priority: 'high',
+      enquiryEmail: 'Dear Sir/Madam,\n\nWe are interested in MS Round Bar with cutting and threading service.\n\nPlease provide a quotation.\n\nBest regards',
+      type: 'enquiry'
     },
-    { 
+    {
       id: 'ORD-2024-002',
-      client: 'Sai Engineering', 
-      summary: 'Quotation ready for review', 
+      client: 'Sai Engineering',
+      summary: 'Quotation ready for review',
       time: '45 min ago',
       status: 'pending',
       amount: '₹24,250',
-      priority: 'medium'
+      priority: 'medium',
+      type: 'enquiry'
     },
-    { 
+    {
       id: 'ORD-2024-003',
-      client: 'Patel Fabricators', 
-      summary: 'Order completed and delivered', 
+      client: 'Patel Fabricators',
+      summary: 'Purchase order received',
       time: '1 day ago',
-      status: 'completed',
+      status: 'unread',
       amount: '₹29,500',
-      priority: 'medium'
+      priority: 'medium',
+      enquiryEmail: 'We would like to place a purchase order for Steel Plates with plasma cutting and edge finishing.',
+      type: 'purchase_order'
+    },
+    {
+      id: 'ORD-2024-004',
+      client: 'ABC Manufacturing',
+      summary: 'Quotation sent',
+      time: '2 hours ago',
+      status: 'quotations',
+      amount: '₹15,200',
+      priority: 'medium',
+      type: 'enquiry',
+      processedDetails: {
+        steps: ['Email discrepancy addressed', 'Quotation generated', 'Email drafted and sent'],
+        timestamp: new Date()
+      }
+    },
+    {
+      id: 'ORD-2024-005',
+      client: 'XYZ Corp',
+      summary: 'Invoice sent',
+      time: '3 hours ago',
+      status: 'invoices',
+      amount: '₹45,000',
+      priority: 'high',
+      type: 'purchase_order',
+      processedDetails: {
+        steps: ['Invoice generated', 'Email drafted and sent'],
+        timestamp: new Date()
+      }
     }
+  ]);
+
+  const [processingOrder, setProcessingOrder] = useState<Order | null>(null);
+  const [showProcessingModal, setShowProcessingModal] = useState(false);
+
+  // Helper function to highlight matching text
+  const highlightMatches = (text: string, query: string): JSX.Element | string => {
+    if (!query || query.length < 3) return text;
+
+    const lowerText = text.toLowerCase();
+    const lowerQuery = query.toLowerCase();
+    const parts: (JSX.Element | string)[] = [];
+
+    let lastIndex = 0;
+    let index = lowerText.indexOf(lowerQuery);
+
+    while (index !== -1) {
+      // Add text before match
+      if (index > lastIndex) {
+        parts.push(text.substring(lastIndex, index));
+      }
+
+      // Add highlighted match
+      parts.push(
+        <span key={`${index}-${lastIndex}`} className="bg-yellow-200 font-semibold">
+          {text.substring(index, index + query.length)}
+        </span>
+      );
+
+      lastIndex = index + query.length;
+      index = lowerText.indexOf(lowerQuery, lastIndex);
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push(text.substring(lastIndex));
+    }
+
+    return parts.length > 0 ? <span>{parts}</span> : text;
+  };
+
+  // Helper function to check if order matches search query
+  const matchesSearch = (order: Order, query: string): boolean => {
+    if (query.length < 3) return true;
+
+    const lowerQuery = query.toLowerCase();
+
+    return (
+      order.id.toLowerCase().includes(lowerQuery) ||
+      order.client.toLowerCase().includes(lowerQuery) ||
+      order.summary.toLowerCase().includes(lowerQuery) ||
+      order.amount.toLowerCase().includes(lowerQuery) ||
+      order.status.toLowerCase().includes(lowerQuery) ||
+      order.priority.toLowerCase().includes(lowerQuery)
+    );
+  };
+
+  // Filter orders: first by search, then by active tab
+  const filteredOrders = orders
+    .filter(order => matchesSearch(order, searchQuery))
+    .filter(order => order.status === activeTab);
+
+  // For tab counts: show filtered count if searching, otherwise show total per tab
+  const getTabCount = (tabStatus: string): number => {
+    if (searchQuery.length < 3) {
+      return orders.filter(o => o.status === tabStatus).length;
+    }
+    return orders
+      .filter(o => matchesSearch(o, searchQuery))
+      .filter(o => o.status === tabStatus).length;
+  };
+
+  const tabs = [
+    { id: 'unread', label: 'Unread', count: getTabCount('unread') },
+    { id: 'pending', label: 'Pending', count: getTabCount('pending') },
+    { id: 'quotations', label: 'Quotations', count: getTabCount('quotations') },
+    { id: 'invoices', label: 'Invoices', count: getTabCount('invoices') }
   ];
 
-  const filteredOrders = orders.filter(order => {
-    if (activeTab === 'Unread') return order.status === 'unread';
-    if (activeTab === 'Pending') return order.status === 'pending';
-    if (activeTab === 'Completed') return order.status === 'completed';
-    return true;
-  });
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.currentTarget.value);
+  };
+
+  // Handle Enter key
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      // Search already happens in real-time, just prevent form submission
+      e.preventDefault();
+    }
+  };
+
+  // Clear search
+  const handleClearSearch = () => {
+    setSearchQuery('');
+  };
 
   const getStatusColor = (status: string) => {
     switch(status) {
       case 'unread': return 'bg-blue-100 text-blue-700';
       case 'pending': return 'bg-yellow-100 text-yellow-700';
-      case 'completed': return 'bg-green-100 text-green-700';
+      case 'quotations': return 'bg-green-100 text-green-700';
+      case 'invoices': return 'bg-purple-100 text-purple-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -64,6 +213,17 @@ const Orders: React.FC = () => {
       case 'low': return 'bg-green-100 text-green-700';
       default: return 'bg-gray-100 text-gray-700';
     }
+  };
+
+  const handleProcessOrder = (order: Order) => {
+    setProcessingOrder(order);
+    setShowProcessingModal(true);
+  };
+
+  const handleOrderProcessed = (updatedOrder: Order) => {
+    setOrders(orders.map(o => o.id === updatedOrder.id ? updatedOrder : o));
+    setShowProcessingModal(false);
+    setProcessingOrder(null);
   };
 
   return (
@@ -78,16 +238,49 @@ const Orders: React.FC = () => {
             </div>
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <input 
-                  type="text" 
-                  placeholder="Search orders..."
-                  className="w-80 pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:border-primary focus:outline-none transition-colors"
+                <input
+                  type="text"
+                  placeholder="Search by Order ID, Client, Amount, etc..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onKeyDown={handleSearchKeyDown}
+                  className="w-80 pl-9 pr-9 py-2.5 border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:border-primary focus:outline-none transition-colors text-sm"
                 />
-                <span className="absolute left-3 top-3 text-gray-400">Search</span>
+                <svg
+                  className="absolute left-3 top-2.5 w-5 h-5 text-gray-400 pointer-events-none"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                {searchQuery && (
+                  <button
+                    onClick={handleClearSearch}
+                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
+                    title="Clear search"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                )}
               </div>
-              <button className="px-4 py-2.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
-                Export
-              </button>
             </div>
           </div>
         </div>
@@ -184,12 +377,18 @@ const Orders: React.FC = () => {
                     <tr key={order.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{order.id}</div>
-                          <div className="text-sm text-gray-500">{order.summary}</div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {highlightMatches(order.id, searchQuery)}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {highlightMatches(order.summary, searchQuery)}
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{order.client}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {highlightMatches(order.client, searchQuery)}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
@@ -202,21 +401,27 @@ const Orders: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {order.amount}
+                        {highlightMatches(order.amount, searchQuery)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {order.time}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Link href={`/order-detail?id=${order.id}&status=${order.status}&client=${encodeURIComponent(order.client)}`}>
-                          <button className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                            order.status === 'completed'
-                              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                              : 'bg-primary text-white hover:bg-primary-dark'
-                          }`}>
-                            {order.status === 'completed' ? 'View' : 'Process'}
+                        {(order.status === 'unread' || order.status === 'pending') ? (
+                          <button
+                            onClick={() => handleProcessOrder(order)}
+                            className="px-3 py-1.5 rounded-md text-sm font-medium bg-primary text-white hover:bg-primary-dark transition-colors"
+                          >
+                            Process Now
                           </button>
-                        </Link>
+                        ) : (
+                          <button
+                            onClick={() => handleProcessOrder(order)}
+                            className="px-3 py-1.5 rounded-md text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                          >
+                            View Details
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -225,19 +430,62 @@ const Orders: React.FC = () => {
             ) : (
               <div className="p-12 text-center">
                 <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                  <span className="text-2xl text-gray-400 font-bold">O</span>
+                  {searchQuery.length >= 3 ? (
+                    <svg
+                      className="w-8 h-8 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  ) : (
+                    <span className="text-2xl text-gray-400 font-bold">O</span>
+                  )}
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No orders in {activeTab.toLowerCase()}</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  {searchQuery.length >= 3 ? 'No results found' : `No orders in ${activeTab}`}
+                </h3>
                 <p className="text-gray-500">
-                  {activeTab === 'Unread' && 'New orders will appear here when they arrive'}
-                  {activeTab === 'Pending' && 'Orders waiting for action will be shown here'}
-                  {activeTab === 'Completed' && 'Completed orders will be listed here'}
+                  {searchQuery.length >= 3 ? (
+                    <>
+                      No orders match "<strong>{searchQuery}</strong>" in the {activeTab} section.{' '}
+                      <button
+                        onClick={handleClearSearch}
+                        className="text-primary hover:underline font-medium"
+                      >
+                        Clear search
+                      </button>
+                      {' '}to see all orders.
+                    </>
+                  ) : (
+                    <>
+                      {activeTab === 'unread' && 'New orders will appear here when they arrive'}
+                      {activeTab === 'pending' && 'Orders waiting for quotation generation will be shown here'}
+                      {activeTab === 'quotations' && 'Completed quotations will be listed here'}
+                      {activeTab === 'invoices' && 'Generated invoices will be listed here'}
+                    </>
+                  )}
                 </p>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Processing Modal */}
+      {showProcessingModal && processingOrder && (
+        <OrderProcessingModal
+          order={processingOrder}
+          onClose={() => setShowProcessingModal(false)}
+          onProcessed={handleOrderProcessed}
+        />
+      )}
     </Layout>
   );
 };
