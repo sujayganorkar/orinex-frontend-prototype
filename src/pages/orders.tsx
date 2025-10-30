@@ -100,9 +100,8 @@ const Orders: React.FC = () => {
                 <p className="text-sm font-medium text-gray-600">Total Today</p>
                 <p className="text-2xl font-bold text-gray-900">8</p>
               </div>
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <span className="text-blue-600 font-bold">T</span>
-              </div>
+              {/* <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center"> */}
+              {/* </div> */}
             </div>
           </div>
           <div className="bg-white rounded-xl shadow-card border border-gray-100 p-6">
@@ -111,9 +110,8 @@ const Orders: React.FC = () => {
                 <p className="text-sm font-medium text-gray-600">Processed</p>
                 <p className="text-2xl font-bold text-gray-900">5</p>
               </div>
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <span className="text-green-600 font-bold">P</span>
-              </div>
+              {/* <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              </div> */}
             </div>
           </div>
           <div className="bg-white rounded-xl shadow-card border border-gray-100 p-6">
@@ -122,9 +120,8 @@ const Orders: React.FC = () => {
                 <p className="text-sm font-medium text-gray-600">Pending Action</p>
                 <p className="text-2xl font-bold text-gray-900">3</p>
               </div>
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <span className="text-orange-600 font-bold">A</span>
-              </div>
+              {/* <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center"> */}
+              {/* </div> */}
             </div>
           </div>
         </div>
